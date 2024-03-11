@@ -81,7 +81,7 @@ data class User(
                 val commonEnd = if (hostSlot.endTime.isBefore(guestSlot.endTime)) hostSlot.endTime else guestSlot.endTime
                 val commonDuration = Duration.between(commonStart, commonEnd).toMinutes()
                 if (commonDuration >= durationMinutes) {
-                    commonFreeSlots.add(Period(commonStart, commonEnd))
+                    commonFreeSlots.add(Period(commonStart, commonStart.plusMinutes(durationMinutes)))
                 }
             }
         }

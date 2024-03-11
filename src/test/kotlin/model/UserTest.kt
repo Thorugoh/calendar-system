@@ -11,14 +11,20 @@ class UserTest {
     @Test
     fun `test findBestMeetingTime`() {
         // Create host and guest users
-        val host = User("Host")
-        val guest = User("Guest")
+        val host = User("Host").apply {
+            startDay = LocalTime.of(6, 0)
+            endDay = LocalTime.of(18, 0)
+        }
+        val guest = User("Guest").apply {
+            startDay = LocalTime.of(6, 0)
+            endDay = LocalTime.of(18, 0)
+        }
 
         // Set up some meetings for the host and guest
         host.meetings = setOf(
             Meeting(
                 participants = setOf(host),
-                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)),
+                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(6, 0)),
                 endTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0))
             ),
             Meeting(
@@ -31,7 +37,7 @@ class UserTest {
         guest.meetings = setOf(
             Meeting(
                 participants = setOf(guest),
-                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)),
+                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(6, 0)),
                 endTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0))
             ),
             Meeting(
@@ -45,9 +51,9 @@ class UserTest {
         val bestMeetingTime = host.findBestMeetingTime(guest, 30)
 
         // Expected result: Start time at 10:30
-        assertEquals(LocalTime.of(10, 30), bestMeetingTime?.startTime?.toLocalTime())
+        assertEquals(LocalTime.of(10, 0), bestMeetingTime?.startTime?.toLocalTime())
 
         // Expected result: End time at 11:00
-        assertEquals(LocalTime.of(11, 0), bestMeetingTime?.endTime?.toLocalTime())
+        assertEquals(LocalTime.of(10, 30), bestMeetingTime?.endTime?.toLocalTime())
     }
 }
