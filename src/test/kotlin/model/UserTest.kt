@@ -9,63 +9,45 @@ import kotlin.test.assertEquals
 
 class UserTest {
     @Test
-    fun testBestMeetingTimes_noMeetings_shouldBeFullDay(){
-        val user = User("Victor")
+    fun `test findBestMeetingTime`() {
+        // Create host and guest users
+        val host = User("Host")
+        val guest = User("Guest")
 
-        val day = LocalDate.of(2024, 3, 2)
-        val result = user.bestMeetingTimes(day, 60)
-
-        val expected = setOf(
-            Period(LocalDateTime.of(day, LocalTime.MIN), LocalDateTime.of(day, LocalTime.MAX))
+        // Set up some meetings for the host and guest
+        host.meetings = setOf(
+            Meeting(
+                participants = setOf(host),
+                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)),
+                endTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0))
+            ),
+            Meeting(
+                participants = setOf(host),
+                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(11, 0)),
+                endTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))
+            )
         )
 
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun testBestMeetingTimes_withMeetings() {
-        val user = User("Victor")
-
-        val day = LocalDate.of(2024, 3, 2)
-
-        val morningMeeting = Meeting(LocalDateTime.of(day, LocalTime.of(9, 0)), LocalDateTime.of(day, LocalTime.of(10, 0)), setOf())
-        val afternoonMeeting = Meeting(LocalDateTime.of(day, LocalTime.of(14, 0)), LocalDateTime.of(day, LocalTime.of(15, 0)), setOf())
-
-        user.meetings = setOf(morningMeeting, afternoonMeeting)
-
-        val result = user.bestMeetingTimes(day, 30)
-
-        val expected = setOf(
-            Period(LocalDateTime.of(day, LocalTime.MIN), LocalDateTime.of(day, LocalTime.of(9, 0))),
-            Period(LocalDateTime.of(day, LocalTime.of(10, 0)), LocalDateTime.of(day, LocalTime.of(14, 0))),
-            Period(LocalDateTime.of(day, LocalTime.of(15, 0)), LocalDateTime.of(day, LocalTime.MAX)),
+        guest.meetings = setOf(
+            Meeting(
+                participants = setOf(guest),
+                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)),
+                endTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0))
+            ),
+            Meeting(
+                participants = setOf(guest),
+                startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0)),
+                endTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(13, 0))
+            )
         )
 
-        assertEquals(expected, result)
-    }
+        // Find the best meeting time between host and guest for a meeting of 30 minutes duration
+        val bestMeetingTime = host.findBestMeetingTime(guest, 30)
 
-    @Test
-    fun testBestMeetingTimes_withMeetingsAndAvailabilityTime() {
-        val user = User("Victor").apply {
-            startDay = LocalTime.of(8, 0)
-            endDay = LocalTime.of(18, 0)
-        }
+        // Expected result: Start time at 10:30
+        assertEquals(LocalTime.of(10, 30), bestMeetingTime?.startTime?.toLocalTime())
 
-        val day = LocalDate.of(2024, 3, 2)
-
-        val morningMeeting = Meeting(LocalDateTime.of(day, LocalTime.of(9, 0)), LocalDateTime.of(day, LocalTime.of(10, 0)), setOf())
-        val afternoonMeeting = Meeting(LocalDateTime.of(day, LocalTime.of(14, 0)), LocalDateTime.of(day, LocalTime.of(15, 0)), setOf())
-
-        user.meetings = setOf(morningMeeting, afternoonMeeting)
-
-        val result = user.bestMeetingTimes(day, 30)
-
-        val expected = setOf(
-            Period(LocalDateTime.of(day, user.startDay), LocalDateTime.of(day, LocalTime.of(9, 0))),
-            Period(LocalDateTime.of(day, LocalTime.of(10, 0)), LocalDateTime.of(day, LocalTime.of(14, 0))),
-            Period(LocalDateTime.of(day, LocalTime.of(15, 0)), LocalDateTime.of(day, user.endDay)),
-        )
-
-        assertEquals(expected, result)
+        // Expected result: End time at 11:00
+        assertEquals(LocalTime.of(11, 0), bestMeetingTime?.endTime?.toLocalTime())
     }
 }
