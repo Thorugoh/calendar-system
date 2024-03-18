@@ -4,7 +4,7 @@ import org.example.data.UserEntity
 import org.example.model.User
 
 fun User.toEntity(): UserEntity {
-    return UserEntity(this.name, this.id, this.meetings.map { it.toEntity() }.toSet())
+    return UserEntity(this.name, this.id)
 }
 
 fun UserEntity.toModel(): User {
